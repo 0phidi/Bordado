@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Patrones de Tejido Textil</title>
+    <style>
+        /* --- Estilos CSS Textil --- */
+        
+        /* 1. Fondo de la Aplicación (Efecto Textil Amarillo) */
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            /* Fondo de tela amarilla/mostaza */
+            background-color: #F1C40F; 
+            background-image: repeating-linear-gradient(
+                -45deg,
+                #F39C12, 
+                #F39C12 1px, 
+                #F1C40F 1px, 
+                #F1C40F 3px 
+            );
+            color: #4A235A; /* Color púrpura oscuro para el texto */
+        }
+
+        /* 2. Título con Efecto de Bordado Púrpura */
+        h1 {
+            color: #4A235A; 
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            /* Sombra de texto para simular el relieve del bordado */
+            text-shadow: 
+                2px 2px 0 #5B2C6F, /* Sombra para profundidad */
+                -1px -1px 0 #A93226; /* Contorno ligero para el efecto de hilo */
+            padding: 10px;
+            border: 3px dashed #5B2C6F; /* Borde punteado como costura */
+        }
+
+        /* 3. Estilos de los Controles (Panel) */
+        .controles {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #4A235A; /* Fondo púrpura para el panel */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            border: 3px solid #F1C40F; /* Borde contrastante */
+        }
+        
+        /* 4. Estilos de la Malla */
+        #malla-contenedor {
+            display: grid;
+            grid-template-columns: repeat(30, 15px); 
+            border: 5px solid #4A235A; /* Borde grueso púrpura */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            background-color: white; /* Asegura un fondo claro para la malla */
+        }
+
+        .celda {
+            width: 15px;
+            height: 15px;
+            border: 1px solid #C0C0C0; /* Líneas de la cuadrícula más sutiles */
+            background-color: white; 
+            cursor: crosshair;
+            transition: background-color 0.1s;
+        }
+
+        /* 5. Estilos de Botones (con efecto textil) */
+        button {
+            padding: 10px 15px;
+            border: 2px dashed #F1C40F; /* Borde punteado/costura */
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s, color 0.2s;
+            color: #F1C40F; /* Texto amarillo */
+            background-color: #5B2C6F; /* Fondo púrpura */
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4); /* Efecto de hundimiento */
+        }
+
+        button:hover {
+            background-color: #6C3483;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        #borrador-btn.activo {
+            background-color: #A93226; /* Color rojizo para el borrador activo */
+            border-color: #F1C40F;
+        }
+
+        /* Etiqueta de color */
+        label {
+            font-weight: bold;
+            color: #F1C40F; /* Texto amarillo en el panel púrpura */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🧶 BITÁCORA TEXTIL - Generador de Patrones 🧶</h1>
+
+    <div class="controles">
+        <label for="color-picker">🎨 Color de Tejido:</label>
+        <input type="color" id="color-picker" value="#4A235A"> <button id="borrador-btn">✏️ Borrador</button>
+        
+        <button id="guardar-btn">💾 Guardar Patrón</button>
+    </div>
+
+    <div id="malla-contenedor">
+        </div>
+
+    <script>
+        // --- Lógica JavaScript (Sin cambios, solo se mantuvo la funcionalidad) ---
+
+        const MALLA_SIZE = 30;
+        const contenedor = document.getElementById('malla-contenedor');
+        const colorPicker = document.getElementById('color-picker');
+        const borradorBtn = document.getElementById('borrador-btn');
+        const guardarBtn = document.getElementById('guardar-btn');
+        const DEFAULT_COLOR = 'white'; 
+        
+        let colorActual = colorPicker.value; 
+        let esBorradorActivo = false;
+
+        contenedor.style.gridTemplateColumns = `repeat(${MALLA_SIZE}, 15px)`;
+
+        function generarMalla() {
+            for (let i = 0; i < MALLA_SIZE * MALLA_SIZE; i++) {
+                const celda = document.createElement('div');
+                celda.classList.add('celda');
+                celda.dataset.color = DEFAULT_COLOR;
+                contenedor.appendChild(celda);
+
+                celda.addEventListener('mousedown', pintarCelda);
+                celda.addEventListener('mouseover', (e) => {
+                    if (e.buttons === 1) {
+                        pintarCelda(e);
+                    }
+                });
+            }
+        }
+
+        function pintarCelda(e) {
+            const celda = e.target;
+            
+            if (esBorradorActivo) {
+                celda.style.backgroundColor = DEFAULT_COLOR;
+                celda.dataset.color = DEFAULT_COLOR;
+            } else {
+                celda.style.backgroundColor = colorActual;
+                celda.dataset.color = colorActual;
+            }
+        }
+
+        colorPicker.addEventListener('input', (e) => {
+            colorActual = e.target.value;
+            esBorradorActivo = false;
+            borradorBtn.classList.remove('activo');
+        });
+
+        borradorBtn.addEventListener('click', () => {
+            esBorradorActivo = !esBorradorActivo;
+            borradorBtn.classList.toggle('activo', esBorradorActivo);
+        });
+
+        // La función guardarPatron y la carga de html2canvas (externa)
+        function guardarPatron() {
+            const controles = document.querySelector('.controles');
+            controles.style.display = 'none'; // Oculta controles
+
+            html2canvas(contenedor, { 
+                scale: 5, 
+                useCORS: true 
+            }).then(canvas => {
+                const imgURL = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = imgURL;
+                a.download = 'patron-tejido-textil.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                controles.style.display = 'flex'; // Muestra controles de nuevo
+                alert('¡Patrón textil guardado exitosamente!');
+            });
+        }
+
+        guardarBtn.addEventListener('click', guardarPatron);
+
+        document.addEventListener('DOMContentLoaded', generarMalla);
+    </script>
+    
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>
